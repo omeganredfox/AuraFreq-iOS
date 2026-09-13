@@ -1,35 +1,35 @@
-# ğŸ¤– AURAFREQ SUBAGENT PROTOKOLÃœ
+# ÄŸÅ¸Â¤â€“ AURAFREQ SUBAGENT PROTOKOLÃƒÅ“
 
-Bu belge, Ana OrkestratÃ¶r'Ã¼n (Gemini/Antigravity) bÃ¼yÃ¼k ve karmaÅŸÄ±k gÃ¶revleri daha kÃ¼Ã§Ã¼k, otonom alt ajanlara (Subagents) nasÄ±l daÄŸÄ±tacaÄŸÄ±nÄ± standartlaÅŸtÄ±rÄ±r.
+Bu belge, Ana OrkestratÃƒÂ¶r'ÃƒÂ¼n (Gemini/Antigravity) bÃƒÂ¼yÃƒÂ¼k ve karmaÃ…Å¸Ã„Â±k gÃƒÂ¶revleri daha kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k, otonom alt ajanlara (Subagents) nasÃ„Â±l daÃ„Å¸Ã„Â±tacaÃ„Å¸Ã„Â±nÃ„Â± standartlaÃ…Å¸tÃ„Â±rÃ„Â±r.
 
 ## 1. Alt Ajan (Subagent) Felsefesi
-Subagent'lar, Ana OrkestratÃ¶r'Ã¼n "biliÅŸsel yÃ¼kÃ¼nÃ¼" (context window) hafifletmek, araÅŸtÄ±rmalarÄ± paralel yÃ¼rÃ¼tmek veya derinlemesine kod analizi yaptÄ±rmak iÃ§in kullanÄ±lÄ±r. Her Subagent spesifik bir role sahiptir ve sadece o role odaklanÄ±r.
+Subagent'lar, Ana OrkestratÃƒÂ¶r'ÃƒÂ¼n "biliÃ…Å¸sel yÃƒÂ¼kÃƒÂ¼nÃƒÂ¼" (context window) hafifletmek, araÃ…Å¸tÃ„Â±rmalarÃ„Â± paralel yÃƒÂ¼rÃƒÂ¼tmek veya derinlemesine kod analizi yaptÃ„Â±rmak iÃƒÂ§in kullanÃ„Â±lÃ„Â±r. Her Subagent spesifik bir role sahiptir ve sadece o role odaklanÃ„Â±r.
 
-## 2. Ne Zaman Subagent KullanÄ±lmalÄ±?
-* **AÄŸÄ±r AraÅŸtÄ±rma:** Ã‡ok sayÄ±da dosyanÄ±n okunmasÄ± veya internetten uzun dokÃ¼manlarÄ±n taranmasÄ± gerektiÄŸinde (`research` subagent).
-* **Paralel GÃ¶revler:** OrkestratÃ¶r bir Ã¶zelliÄŸi yazarken, testleri veya UI bileÅŸenini baÅŸka bir ajanÄ±n hazÄ±rlamasÄ± gerektiÄŸinde.
-* **Ä°zole Ã‡alÄ±ÅŸma AlanÄ± (Branching):** Yeni ve deneysel bir Ã¶zellik geliÅŸtirilecekse, mevcut kodu bozmamak iÃ§in git mantÄ±ÄŸÄ±na benzer `branch` workspace moduyla subagent Ã§aÄŸrÄ±lÄ±r.
+## 2. Ne Zaman Subagent KullanÃ„Â±lmalÃ„Â±?
+* **AÃ„Å¸Ã„Â±r AraÃ…Å¸tÃ„Â±rma:** Ãƒâ€¡ok sayÃ„Â±da dosyanÃ„Â±n okunmasÃ„Â± veya internetten uzun dokÃƒÂ¼manlarÃ„Â±n taranmasÃ„Â± gerektiÃ„Å¸inde (`research` subagent).
+* **Paralel GÃƒÂ¶revler:** OrkestratÃƒÂ¶r bir ÃƒÂ¶zelliÃ„Å¸i yazarken, testleri veya UI bileÃ…Å¸enini baÃ…Å¸ka bir ajanÃ„Â±n hazÃ„Â±rlamasÃ„Â± gerektiÃ„Å¸inde.
+* **Ã„Â°zole Ãƒâ€¡alÃ„Â±Ã…Å¸ma AlanÃ„Â± (Branching):** Yeni ve deneysel bir ÃƒÂ¶zellik geliÃ…Å¸tirilecekse, mevcut kodu bozmamak iÃƒÂ§in git mantÃ„Â±Ã„Å¸Ã„Â±na benzer `branch` workspace moduyla subagent ÃƒÂ§aÃ„Å¸rÃ„Â±lÃ„Â±r.
 
 ## 3. Standart Subagent Rolleri
 
-### ğŸ” AraÅŸtÄ±rmacÄ± (Researcher)
-- **TÃ¼r:** `research` (YerleÅŸik)
-- **GÃ¶rev:** Projedeki belirli API'lerin kullanÄ±mÄ±nÄ± araÅŸtÄ±rmak, baÄŸÄ±mlÄ±lÄ±klarÄ± incelemek, log dosyalarÄ±nÄ± taramak veya web'den kÃ¼tÃ¼phane dokÃ¼mantasyonu bulmak.
-- **KÄ±sÄ±tlama:** Kod yazamaz, sadece okur ve OrkestratÃ¶r'e raporlar.
+### ÄŸÅ¸â€Â AraÃ…Å¸tÃ„Â±rmacÃ„Â± (Researcher)
+- **TÃƒÂ¼r:** `research` (YerleÃ…Å¸ik)
+- **GÃƒÂ¶rev:** Projedeki belirli API'lerin kullanÃ„Â±mÃ„Â±nÃ„Â± araÃ…Å¸tÃ„Â±rmak, baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± incelemek, log dosyalarÃ„Â±nÃ„Â± taramak veya web'den kÃƒÂ¼tÃƒÂ¼phane dokÃƒÂ¼mantasyonu bulmak.
+- **KÃ„Â±sÃ„Â±tlama:** Kod yazamaz, sadece okur ve OrkestratÃƒÂ¶r'e raporlar.
 
-### ğŸ§ª Test YazÄ±cÄ± (QA Specialist)
-- **TÃ¼r:** `self` (OrkestratÃ¶r yeteneklerini kopyalar)
-- **GÃ¶rev:** OrkestratÃ¶r tarafÄ±ndan yazÄ±lmÄ±ÅŸ bir bileÅŸenin Jest/RTL testlerini yazmak. `branch` modunda Ã§alÄ±ÅŸÄ±p testin yeÅŸil olduÄŸunu doÄŸruladÄ±ktan sonra OrkestratÃ¶r'e mesaj atar.
+### ÄŸÅ¸Â§Âª Test YazÃ„Â±cÃ„Â± (QA Specialist)
+- **TÃƒÂ¼r:** `self` (OrkestratÃƒÂ¶r yeteneklerini kopyalar)
+- **GÃƒÂ¶rev:** OrkestratÃƒÂ¶r tarafÃ„Â±ndan yazÃ„Â±lmÃ„Â±Ã…Å¸ bir bileÃ…Å¸enin Jest/RTL testlerini yazmak. `branch` modunda ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±p testin yeÃ…Å¸il olduÃ„Å¸unu doÃ„Å¸ruladÃ„Â±ktan sonra OrkestratÃƒÂ¶r'e mesaj atar.
 
-### ğŸ¨ UI/UX TasarÄ±m AsistanÄ±
-- **TÃ¼r:** `self` (Ã–zel Prompt ile)
-- **GÃ¶rev:** Mevcut tasarÄ±m dilini analiz edip (Ã¶rn: Endel tarzÄ± minimalist OLED UI), belirli bir ekranÄ±n CSS/StyleSheet'ini baÅŸtan yazmak.
+### ÄŸÅ¸ÂÂ¨ UI/UX TasarÃ„Â±m AsistanÃ„Â±
+- **TÃƒÂ¼r:** `self` (Ãƒâ€“zel Prompt ile)
+- **GÃƒÂ¶rev:** Mevcut tasarÃ„Â±m dilini analiz edip (ÃƒÂ¶rn: Endel tarzÃ„Â± minimalist OLED UI), belirli bir ekranÃ„Â±n CSS/StyleSheet'ini baÃ…Å¸tan yazmak.
 
-## 4. Ä°letiÅŸim ve YaÅŸam DÃ¶ngÃ¼sÃ¼
-1. **OluÅŸturma:** OrkestratÃ¶r `invoke_subagent` Ã§aÄŸrÄ±sÄ±yla alt ajanÄ± baÅŸlatÄ±r. Ajana kesin ve net bir Prompt verilir (Ã–rn: "src/screens/MixerScreen.tsx iÃ§indeki performans sorunlarÄ±nÄ± bul ve raporla").
-2. **Bekleme Yok:** OrkestratÃ¶r, subagent'Ä±n bitmesini dÃ¶ngÃ¼yle beklemez. Kendi iÅŸine devam eder.
-3. **MesajlaÅŸma:** Subagent iÅŸini bitirdiÄŸinde Ana OrkestratÃ¶r'e asenkron olarak mesaj gÃ¶nderir. OrkestratÃ¶r uyanÄ±p sonucu alÄ±r.
-4. **Temizlik:** GÃ¶revi biten ve artÄ±k gerekmeyen subagent'lar `manage_subagents` aracÄ±yla (kill) temizlenir.
+## 4. Ã„Â°letiÃ…Å¸im ve YaÃ…Å¸am DÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
+1. **OluÃ…Å¸turma:** OrkestratÃƒÂ¶r `invoke_subagent` ÃƒÂ§aÃ„Å¸rÃ„Â±sÃ„Â±yla alt ajanÃ„Â± baÃ…Å¸latÃ„Â±r. Ajana kesin ve net bir Prompt verilir (Ãƒâ€“rn: "src/screens/MixerScreen.tsx iÃƒÂ§indeki performans sorunlarÃ„Â±nÃ„Â± bul ve raporla").
+2. **Bekleme Yok:** OrkestratÃƒÂ¶r, subagent'Ã„Â±n bitmesini dÃƒÂ¶ngÃƒÂ¼yle beklemez. Kendi iÃ…Å¸ine devam eder.
+3. **MesajlaÃ…Å¸ma:** Subagent iÃ…Å¸ini bitirdiÃ„Å¸inde Ana OrkestratÃƒÂ¶r'e asenkron olarak mesaj gÃƒÂ¶nderir. OrkestratÃƒÂ¶r uyanÃ„Â±p sonucu alÃ„Â±r.
+4. **Temizlik:** GÃƒÂ¶revi biten ve artÃ„Â±k gerekmeyen subagent'lar `manage_subagents` aracÃ„Â±yla (kill) temizlenir.
 
-## 5. Yerel AI (Ollama) ile Entegrasyon (Seviye 2 Ä°ÅŸÃ§iler)
-Subagent'lar sadece Gemini tabanlÄ± olmak zorunda deÄŸildir. Ã‡ok basit kod tamamlama, kÃ¼Ã§Ã¼k refactor'lar veya regex yazÄ±mÄ± gibi kÄ±sa gÃ¶revler iÃ§in `~/.gemini/config/skills/local_ai` Ã¼zerinden Ollama modelleri (`devstral-small-2`) REST API ile Ã§aÄŸrÄ±lÄ±p Subagent gibi kullanÄ±labilir.
+## 5. Yerel AI (Ollama) ile Entegrasyon (Seviye 2 Ã„Â°Ã…Å¸ÃƒÂ§iler)
+Subagent'lar sadece Gemini tabanlÃ„Â± olmak zorunda deÃ„Å¸ildir. Ãƒâ€¡ok basit kod tamamlama, kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k refactor'lar veya regex yazÃ„Â±mÃ„Â± gibi kÃ„Â±sa gÃƒÂ¶revler iÃƒÂ§in `~/.gemini/config/skills/local_ai` ÃƒÂ¼zerinden Ollama modelleri (`devstral-small-2`) REST API ile ÃƒÂ§aÃ„Å¸rÃ„Â±lÃ„Â±p Subagent gibi kullanÃ„Â±labilir.
