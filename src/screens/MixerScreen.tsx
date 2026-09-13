@@ -4,6 +4,7 @@ import { dspEngine } from '../audio/dspEngine';
 import { AmbienceType, EntrainmentType, OscillatorWaveType } from '../audio/types';
 import { AppleTheme } from '../theme/colors';
 import { AudioVisualizer } from '../components/AudioVisualizer';
+import { LissajousVisualizer } from '../components/LissajousVisualizer';
 
 interface MixerScreenProps {
   isPlaying: boolean;
@@ -80,6 +81,19 @@ export const MixerScreen: React.FC<MixerScreenProps> = ({ isPlaying, onTogglePla
       <View style={styles.visualizerCard}>
         <AudioVisualizer isPlaying={isPlaying} accentColor={AppleTheme.colors.accentGreen} height={85} />
       </View>
+
+      {/* Lissajous — binaural katmanı aktifken */}
+      {entrainmentEnabled && entrainmentType === 'binaural' && (
+        <View style={{ alignItems: 'center', marginBottom: 12 }}>
+          <LissajousVisualizer
+            isPlaying={isPlaying}
+            leftFreq={carrierFreq}
+            rightFreq={carrierFreq + beatFreq}
+            accentColor={AppleTheme.colors.accentPurple}
+            size={120}
+          />
+        </View>
+      )}
 
       {/* LAYER 1: SAF TON / SOLFEGGIO */}
       <View style={styles.channelStrip}>

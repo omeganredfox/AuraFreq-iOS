@@ -18,7 +18,7 @@ export default function App() {
   };
 
   return (
-    <IPhoneSimulator>
+    <IPhoneSimulator isPlaying={isPlaying} accentColor={activeTab === 'binaural' ? '#BF5AF2' : '#0A84FF'}>
       <SafeAreaView style={styles.safeArea}>
         {/* Top App Bar with Live Indicator */}
         <View style={styles.topBar}>

@@ -4,6 +4,7 @@ import { dspEngine } from '../audio/dspEngine';
 import { OscillatorWaveType } from '../audio/types';
 import { AppleTheme } from '../theme/colors';
 import { AudioVisualizer } from '../components/AudioVisualizer';
+import { RotaryDial } from '../components/RotaryDial';
 
 interface ToneLabScreenProps {
   isPlaying: boolean;
@@ -69,11 +70,18 @@ export const ToneLabScreen: React.FC<ToneLabScreenProps> = ({ isPlaying, onToggl
         <AudioVisualizer isPlaying={isPlaying} accentColor={AppleTheme.colors.accentBlue} height={100} />
       </View>
 
-      {/* Hero Frequency Number */}
-      <View style={styles.freqHeroCard}>
-        <Text style={styles.freqNumber}>{frequency}</Text>
-        <Text style={styles.freqUnit}>Hz</Text>
-      </View>
+      {/* Dairesel Frekans Kadranı (Rotary Dial) */}
+      <RotaryDial
+        value={frequency}
+        min={20}
+        max={2000}
+        step={1}
+        unit="Hz"
+        label="Frekans Kadranı"
+        accentColor={AppleTheme.colors.accentBlue}
+        size={200}
+        onValueChange={handleFreqChange}
+      />
 
       {/* Stepper Tuning Controls */}
       <View style={styles.stepperRow}>

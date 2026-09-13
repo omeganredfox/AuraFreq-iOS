@@ -1,4 +1,4 @@
-﻿export const AppleTheme = {
+export const AppleTheme = {
   colors: {
     background: '#000000',
     card: '#121214',
@@ -15,6 +15,8 @@
     accentRed: '#FF453A',
     danger: '#FF453A',
     tintInactive: '#636366',
+    titaniumBezel: '#3A3A3C',
+    divider: 'rgba(255, 255, 255, 0.08)',
   },
   typography: {
     heroSize: 48,

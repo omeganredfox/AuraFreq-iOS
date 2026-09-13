@@ -1,12 +1,91 @@
-﻿import React from 'react';
-import { View, Text, StyleSheet, Platform, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, Platform, Dimensions, Animated, Easing } from 'react-native';
 import { AppleTheme } from '../theme/colors';
 
 interface SimulatorProps {
   children: React.ReactNode;
+  isPlaying?: boolean;
+  accentColor?: string;
 }
 
-export const IPhoneSimulator: React.FC<SimulatorProps> = ({ children }) => {
+export const IPhoneSimulator: React.FC<SimulatorProps> = ({
+  children,
+  isPlaying = false,
+  accentColor = AppleTheme.colors.accentPurple,
+}) => {
+  // Dynamic Island animation values
+  const islandWidth = useRef(new Animated.Value(120)).current;
+  const islandHeight = useRef(new Animated.Value(34)).current;
+  const islandOpacity = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isPlaying) {
+      // Expand island when playing
+      Animated.parallel([
+        Animated.spring(islandWidth, {
+          toValue: 200,
+          friction: 8,
+          tension: 60,
+          useNativeDriver: false,
+        }),
+        Animated.spring(islandHeight, {
+          toValue: 44,
+          friction: 8,
+          tension: 60,
+          useNativeDriver: false,
+        }),
+        Animated.timing(islandOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+      ]).start();
+
+      // Pulse glow loop
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 1200,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: false,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 0,
+            duration: 1200,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: false,
+          }),
+        ])
+      );
+      pulse.start();
+
+      return () => pulse.stop();
+    } else {
+      // Collapse island
+      Animated.parallel([
+        Animated.spring(islandWidth, {
+          toValue: 120,
+          friction: 8,
+          tension: 60,
+          useNativeDriver: false,
+        }),
+        Animated.spring(islandHeight, {
+          toValue: 34,
+          friction: 8,
+          tension: 60,
+          useNativeDriver: false,
+        }),
+        Animated.timing(islandOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  }, [isPlaying]);
+
   // If running on a real iOS/Android device, display full native screen without mockup chassis
   if (Platform.OS !== 'web') {
     return <View style={styles.nativeContainer}>{children}</View>;
@@ -19,6 +98,11 @@ export const IPhoneSimulator: React.FC<SimulatorProps> = ({ children }) => {
     // If opened on mobile browser, fill the screen
     return <View style={styles.mobileWebContainer}>{children}</View>;
   }
+
+  const glowColor = pulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['rgba(0, 0, 0, 1)', accentColor + '40'],
+  });
 
   return (
     <View style={styles.outerDesktopWrapper}>
@@ -34,12 +118,45 @@ export const IPhoneSimulator: React.FC<SimulatorProps> = ({ children }) => {
       <View style={styles.phoneChassis}>
         {/* Outer Titanium Rim */}
         <View style={styles.phoneScreen}>
-          {/* Dynamic Island */}
+          {/* Dynamic Island — Animated */}
           <View style={styles.islandContainer}>
-            <View style={styles.dynamicIsland}>
+            <Animated.View
+              style={[
+                styles.dynamicIsland,
+                {
+                  width: islandWidth,
+                  height: islandHeight,
+                  backgroundColor: glowColor,
+                },
+              ]}
+            >
               <View style={styles.islandCamera} />
+              {/* Mini player info when playing */}
+              <Animated.View style={[styles.islandMiniPlayer, { opacity: islandOpacity }]}>
+                <Text style={styles.islandMiniIcon}>🎵</Text>
+                <View style={styles.islandMiniPulseRow}>
+                  {[0, 1, 2, 3, 4].map((i) => {
+                    const barHeight = pulseAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [4, 8 + i * 2],
+                    });
+                    return (
+                      <Animated.View
+                        key={i}
+                        style={[
+                          styles.islandMiniBar,
+                          {
+                            height: barHeight,
+                            backgroundColor: accentColor,
+                          },
+                        ]}
+                      />
+                    );
+                  })}
+                </View>
+              </Animated.View>
               <View style={styles.islandSensor} />
-            </View>
+            </Animated.View>
           </View>
 
           {/* Status Bar */}
@@ -81,64 +198,65 @@ const styles = StyleSheet.create({
   },
   outerDesktopWrapper: {
     flex: 1,
-    backgroundColor: '#0A0A0C',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#0A0A0E',
     minHeight: '100vh' as unknown as number,
-    paddingVertical: 20,
+    padding: 20,
   },
   brandHeader: {
     alignItems: 'center',
     marginBottom: 16,
   },
   brandTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: AppleTheme.colors.textPrimary,
-    letterSpacing: 0.5,
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '800',
+    letterSpacing: 1,
   },
   brandSubtitle: {
-    fontSize: 13,
     color: AppleTheme.colors.textSecondary,
+    fontSize: 11,
     marginTop: 4,
   },
   phoneChassis: {
-    width: 410,
-    height: 860,
-    backgroundColor: '#1E1E22', // Brushed titanium frame
-    borderRadius: 56,
-    padding: 10,
+    width: 393 + 12,
+    height: 852 + 12,
+    backgroundColor: AppleTheme.colors.titaniumBezel,
+    borderRadius: 55 + 4,
+    padding: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 24 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.7,
-    shadowRadius: 36,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.16)',
+    shadowRadius: 30,
   },
   phoneScreen: {
     flex: 1,
     backgroundColor: '#000000',
-    borderRadius: 48,
+    borderRadius: 55,
     overflow: 'hidden',
-    position: 'relative',
   },
   islandContainer: {
+    alignItems: 'center',
+    paddingTop: 10,
+    height: 44,
+    alignSelf: 'center',
     position: 'absolute',
-    top: 11,
+    top: 0,
     left: 0,
     right: 0,
-    alignItems: 'center',
     zIndex: 100,
   },
   dynamicIsland: {
     width: 120,
     height: 34,
     backgroundColor: '#000000',
-    borderRadius: 17,
+    borderRadius: 22,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
+    overflow: 'hidden',
   },
   islandCamera: {
     width: 11,
@@ -153,6 +271,27 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 3.5,
     backgroundColor: '#0d0d12',
+  },
+  islandMiniPlayer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  islandMiniIcon: {
+    fontSize: 12,
+  },
+  islandMiniPulseRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 2,
+    height: 16,
+  },
+  islandMiniBar: {
+    width: 3,
+    borderRadius: 1.5,
+    minHeight: 4,
   },
   statusBar: {
     height: 48,

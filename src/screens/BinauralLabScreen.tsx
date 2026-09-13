@@ -6,6 +6,7 @@ import { BRAINWAVE_BANDS, BrainwaveBand } from '../constants/presets';
 import { EntrainmentType } from '../audio/types';
 import { AppleTheme } from '../theme/colors';
 import { AudioVisualizer } from '../components/AudioVisualizer';
+import { LissajousVisualizer } from '../components/LissajousVisualizer';
 
 interface BinauralLabScreenProps {
   isPlaying: boolean;
@@ -128,6 +129,22 @@ export const BinauralLabScreen: React.FC<BinauralLabScreenProps> = ({ isPlaying,
         <AudioVisualizer isPlaying={isPlaying} accentColor={selectedBand.color} height={95} />
       </View>
 
+      {/* Lissajous Rezonans Görselleştiricisi */}
+      {entrainmentType === 'binaural' && (
+        <View style={styles.lissajousCard}>
+          <Text style={styles.lissajousTitle}>Lissajous Rezonans</Text>
+          <LissajousVisualizer
+            isPlaying={isPlaying}
+            leftFreq={binCalc.leftFrequency}
+            rightFreq={binCalc.rightFrequency}
+            accentColor={selectedBand.color}
+            size={160}
+          />
+          <Text style={styles.lissajousCaption}>
+            Sol / Sağ faz farkı geometrisi
+          </Text>
+        </View>
+      )}
       {/* Channel / Pulse Display */}
       {entrainmentType === 'binaural' ? (
         <View style={styles.stereoSplitRow}>
@@ -477,5 +494,28 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  lissajousCard: {
+    backgroundColor: AppleTheme.colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: AppleTheme.colors.divider,
+  },
+  lissajousTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: AppleTheme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    marginBottom: 12,
+  },
+  lissajousCaption: {
+    fontSize: 10,
+    color: AppleTheme.colors.textSecondary,
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });
