@@ -1,0 +1,30 @@
+﻿export const AppleTheme = {
+  colors: {
+    background: '#000000',
+    card: '#121214',
+    cardBorder: 'rgba(255, 255, 255, 0.08)',
+    cardHover: '#1C1C1E',
+    textPrimary: '#FFFFFF',
+    textSecondary: '#8E8E93',
+    textTertiary: '#48484A',
+    accentBlue: '#0A84FF',
+    accentPurple: '#BF5AF2',
+    accentGreen: '#30D158',
+    accentAmber: '#FF9F0A',
+    accentCyan: '#64D2FF',
+    accentRed: '#FF453A',
+    danger: '#FF453A',
+    tintInactive: '#636366',
+  },
+  typography: {
+    heroSize: 48,
+    titleSize: 22,
+    subheadSize: 15,
+    captionSize: 12,
+  },
+  dimensions: {
+    minTouchTarget: 44,
+    borderRadiusCard: 18,
+    borderRadiusButton: 14,
+  },
+};
