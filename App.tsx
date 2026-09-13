@@ -65,7 +65,7 @@ export default function App() {
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             title={activeTab === 'presets' ? 'Şifa Frekansı' : 'Özel Miks'}
-            subtitle=""
+            subtitle={isPlaying ? 'Aktif' : 'Hazır'}
           />
         </View>
 

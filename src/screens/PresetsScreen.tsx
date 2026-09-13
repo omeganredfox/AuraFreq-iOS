@@ -68,11 +68,11 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
   };
 
   const AMBIENCE_OPTIONS: { id: AmbienceType; label: string; icon: keyof typeof Feather.glyphMap }[] = [
-    { id: 'white', label: 'Beyaz Gürültü', icon: 'wind' },
-    { id: 'rain', label: 'Yağmur', icon: 'cloud-drizzle' },
+    { id: 'white', label: 'Beyaz GÃ¼rÃ¼ltÃ¼', icon: 'wind' },
+    { id: 'rain', label: 'YaÄŸmur', icon: 'cloud-drizzle' },
     { id: 'ocean', label: 'Okyanus', icon: 'droplet' },
-    { id: 'pink', label: 'Pembe Gürültü', icon: 'radio' },
-    { id: 'brown', label: 'Kahve Gürültü', icon: 'coffee' },
+    { id: 'pink', label: 'Pembe GÃ¼rÃ¼ltÃ¼', icon: 'radio' },
+    { id: 'brown', label: 'Kahve GÃ¼rÃ¼ltÃ¼', icon: 'coffee' },
   ];
 
   const renderPresetList = (category: PresetCategory, title: string) => {
@@ -104,17 +104,17 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       
-      {/* Uyku Zamanlayıcısı */}
+      {/* Uyku ZamanlayÄ±cÄ±sÄ± */}
       <View style={styles.timerSection}>
-        <Text style={styles.sectionTitle}>Uyku Zamanlayıcısı</Text>
+        <Text style={styles.sectionTitle}>Uyku ZamanlayÄ±cÄ±sÄ±</Text>
         {minutesLeft !== null ? (
           <View style={styles.timerActiveCard}>
             <View style={styles.timerActiveLeft}>
               <Feather name="clock" size={24} color={AppleTheme.colors.accentBlue} />
-              <Text style={styles.timerCountdown}>{minutesLeft} dk kaldı</Text>
+              <Text style={styles.timerCountdown}>{minutesLeft} dk kaldÄ±</Text>
             </View>
             <TouchableOpacity style={styles.timerCancelBtn} onPress={clearTimer}>
-              <Text style={styles.timerCancelText}>İptal Et</Text>
+              <Text style={styles.timerCancelText}>Ä°ptal Et</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -128,7 +128,7 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
         )}
       </View>
 
-      {/* Soundscapes (Doğa & Ambiyans) */}
+      {/* Soundscapes (DoÄŸa & Ambiyans) */}
       <View style={styles.categorySection}>
         <Text style={styles.categoryTitle}>Soundscapes</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScroll}>
@@ -168,7 +168,7 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
                 <View style={styles.cardIconBox}>
                   <Feather name="star" size={32} color={AppleTheme.colors.accentAmber} />
                 </View>
-                <Text style={styles.cardTitle}>{fav.name}</Text>
+                <Text style={[styles.cardTitle, activePresetId === fav.id && { color: AppleTheme.colors.textPrimary }]}>{fav.name}</Text>
                 <Text style={styles.cardSub}>Custom Recipe</Text>
               </TouchableOpacity>
             ))}
@@ -176,7 +176,7 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
         </View>
       )}
 
-      <View style={{ height: 120 }} /> {/* BottomPlayer ve TabBar boşluğu */}
+      <View style={{ height: 168 }} /> {/* BottomPlayer ve TabBar boÅŸluÄŸu */}
     </ScrollView>
   );
 };
@@ -184,7 +184,7 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: AppleTheme.colors.background },
   content: { paddingVertical: 16 },
-  sectionTitle: { fontSize: 20, fontWeight: '700', color: AppleTheme.colors.textPrimary, marginLeft: 16, marginBottom: 12 },
+  sectionTitle: { fontSize: 22, fontWeight: '700', color: AppleTheme.colors.textPrimary, marginLeft: 16, marginBottom: 12 },
   
   categorySection: { marginBottom: 32 },
   categoryTitle: { fontSize: 22, fontWeight: '700', color: AppleTheme.colors.textPrimary, marginLeft: 16, marginBottom: 16 },
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   },
   presetCardActive: {
     backgroundColor: '#1C1C1E', // Hafif parlak siyah
-    borderColor: '#FFFFFF', // Beyaz çizgi
+    borderColor: '#FFFFFF', // Beyaz Ã§izgi
   },
   cardIconBox: {
     width: 64,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   },
   cardSub: {
     fontSize: 12,
-    color: AppleTheme.colors.textTertiary,
+    color: AppleTheme.colors.textSecondary,
     marginTop: 4,
   },
 
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
 
   timerSection: { marginBottom: 32 },
   timerRow: { flexDirection: 'row', gap: 12, paddingHorizontal: 16 },
-  timerBtn: { flex: 1, backgroundColor: AppleTheme.colors.card, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
+  timerBtn: { flex: 1, backgroundColor: AppleTheme.colors.card, borderWidth: 1, borderColor: AppleTheme.colors.cardBorder, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
   timerBtnText: { color: AppleTheme.colors.textPrimary, fontSize: 16, fontWeight: '600' },
   timerActiveCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'rgba(10, 132, 255, 0.1)', marginHorizontal: 16, padding: 16, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(10, 132, 255, 0.3)' },
   timerActiveLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
