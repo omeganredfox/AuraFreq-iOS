@@ -31,8 +31,8 @@ export function calculateBinauralFrequencies(
   const safeCarrier = Math.max(20, Math.min(1500, carrierFrequency));
   const safeBeat = Math.max(0.1, Math.min(100, beatFrequency));
 
-  const leftFrequency = Number((safeCarrier - safeBeat / 2).toFixed(2));
-  const rightFrequency = Number((safeCarrier + safeBeat / 2).toFixed(2));
+  const leftFrequency = (safeCarrier - safeBeat / 2);
+  const rightFrequency = (safeCarrier + safeBeat / 2);
   const actualDelta = Number((rightFrequency - leftFrequency).toFixed(2));
 
   // Determine which brainwave band this falls under
