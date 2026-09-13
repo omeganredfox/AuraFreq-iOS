@@ -89,6 +89,7 @@ export const MixerScreen: React.FC<MixerScreenProps> = ({ isPlaying, onTogglePla
 
   const AMBIENCE_CHOICES: { id: AmbienceType; label: string; icon: string }[] = [
     { id: 'none', label: 'Kapalı', icon: '🚫' },
+    { id: 'white', label: 'Beyaz', icon: '☁️' },
     { id: 'rain', label: 'Yağmur', icon: '🌧️' },
     { id: 'ocean', label: 'Okyanus', icon: '🌊' },
     { id: 'pink', label: 'Pembe', icon: '🌸' },

@@ -1,9 +1,9 @@
 export const AppleTheme = {
   colors: {
     background: '#000000',
-    card: '#121214',
-    cardBorder: 'rgba(255, 255, 255, 0.08)',
-    cardHover: '#1C1C1E',
+    card: '#080808', // Even darker for pure OLED feel
+    cardBorder: 'rgba(255, 255, 255, 0.04)',
+    cardHover: '#111111',
     textPrimary: '#FFFFFF',
     textSecondary: '#8E8E93',
     textTertiary: '#48484A',

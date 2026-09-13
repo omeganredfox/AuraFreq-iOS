@@ -97,12 +97,12 @@ export class AuraDspEngine {
       this.currentConfig = { ...this.currentConfig, ...config };
     }
 
-    const ctx = this.initAudioContext();
     if (this.isRunning) {
-      this.updateParameters();
-      return;
+      // Rebuild entire audio graph to support structural changes cleanly (e.g. enabling/disabling layers)
+      await this.stop();
     }
 
+    const ctx = this.initAudioContext();
     const now = ctx.currentTime;
 
     // 1. Setup Master Bus: Compressor -> Master Gain -> Analyser -> Destination

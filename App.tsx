@@ -6,6 +6,8 @@ import { BinauralLabScreen } from './src/screens/BinauralLabScreen';
 import { MixerScreen } from './src/screens/MixerScreen';
 import { PresetsScreen } from './src/screens/PresetsScreen';
 import { AppleTheme } from './src/theme/colors';
+import { BottomPlayer } from './src/components/BottomPlayer';
+import { Feather } from '@expo/vector-icons';
 
 type TabKey = 'tone' | 'binaural' | 'mixer' | 'presets';
 
@@ -57,15 +59,23 @@ export default function App() {
           )}
         </View>
 
+        {/* Floating Bottom Player */}
+        <View style={styles.playerWrapper}>
+          <BottomPlayer
+            isPlaying={isPlaying}
+            onTogglePlay={handleTogglePlay}
+            title={activeTab === 'presets' ? 'Şifa Frekansı' : 'Özel Miks'}
+            subtitle=""
+          />
+        </View>
+
         {/* Apple HIG Bottom Tab Bar (Gate 4: 48pt targets) */}
         <View style={styles.tabBar}>
           <TouchableOpacity
             style={styles.tabItem}
             onPress={() => setActiveTab('tone')}
           >
-            <Text style={[styles.tabIcon, activeTab === 'tone' && styles.tabIconActive]}>
-              〰️
-            </Text>
+            <Feather name="activity" size={24} color={activeTab === 'tone' ? '#FFFFFF' : '#636366'} />
             <Text style={[styles.tabLabel, activeTab === 'tone' && styles.tabLabelActive]}>
               Saf Ton
             </Text>
@@ -75,9 +85,7 @@ export default function App() {
             style={styles.tabItem}
             onPress={() => setActiveTab('binaural')}
           >
-            <Text style={[styles.tabIcon, activeTab === 'binaural' && styles.tabIconActive]}>
-              🧠
-            </Text>
+            <Feather name="cpu" size={24} color={activeTab === 'binaural' ? '#FFFFFF' : '#636366'} />
             <Text style={[styles.tabLabel, activeTab === 'binaural' && styles.tabLabelActive]}>
               Beyin
             </Text>
@@ -87,9 +95,7 @@ export default function App() {
             style={styles.tabItem}
             onPress={() => setActiveTab('mixer')}
           >
-            <Text style={[styles.tabIcon, activeTab === 'mixer' && styles.tabIconActive]}>
-              🎛️
-            </Text>
+            <Feather name="sliders" size={24} color={activeTab === 'mixer' ? '#FFFFFF' : '#636366'} />
             <Text style={[styles.tabLabel, activeTab === 'mixer' && styles.tabLabelActive]}>
               Mikser
             </Text>
@@ -99,9 +105,7 @@ export default function App() {
             style={styles.tabItem}
             onPress={() => setActiveTab('presets')}
           >
-            <Text style={[styles.tabIcon, activeTab === 'presets' && styles.tabIconActive]}>
-              ✨
-            </Text>
+            <Feather name="moon" size={24} color={activeTab === 'presets' ? '#FFFFFF' : '#636366'} />
             <Text style={[styles.tabLabel, activeTab === 'presets' && styles.tabLabelActive]}>
               Şifa
             </Text>
@@ -217,5 +221,12 @@ const styles = StyleSheet.create({
   tabLabelActive: {
     color: AppleTheme.colors.accentBlue,
     fontWeight: '700',
+  },
+  playerWrapper: {
+    position: 'absolute',
+    bottom: 74, // Above the tab bar
+    left: 0,
+    right: 0,
+    zIndex: 100,
   },
 });
