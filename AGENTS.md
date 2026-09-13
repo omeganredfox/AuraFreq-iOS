@@ -54,3 +54,13 @@ Commit mesajları Conventional Commits formatında olacaktır:
 - `fix(audio): eliminate pop on oscillator stop via exponential ramp`
 - `style(hig): apply ios 18 blurred material to bottom navigation`
 - `test(gates): add stereo isolation and frequency accuracy test cases`
+---
+
+## 5. 🧠 YEREL YAPAY ZEKA DESTEĞİ (GLOBAL LOCAL-AI)
+
+Bu proje, kodlama ve analiz verimliliğini artırmak için **Global Local-AI** sistemini kullanır. 
+Gemini (Ana Orkestratör), bağlamı korumak ve GPU kaynaklarını verimli kullanmak adına uygun alt görevleri yerel Ollama modellerine (127.0.0.1:11434) devreder:
+
+- **LocalCodingSpecialist (devstral-small-2):** İzole kod refaktörleri, bug tespiti ve test yazımı için işçi model. 
+- **LocalFastHelper (qwen3:4b-instruct...):** Hızlı log özetleme ve basit analizler için.
+- **Kural:** Yerel modellerin çıktıları **tavsiye** niteliğindedir. Kod veritabanına eklenmeden önce mutlaka Gemini tarafından test edilir ve onaylanır.

@@ -5,6 +5,7 @@
   "main": "index.ts",
   "dependencies": {
     "@expo/metro-runtime": "~57.0.15",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~57.0.22",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
@@ -14,8 +15,10 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/node": "^26.5.1",
     "@types/react": "~19.2.2",
     "jest": "^30.5.1",
+    "jest-environment-jsdom": "^30.5.1",
     "ts-jest": "^29.4.12",
     "typescript": "~6.0.3"
   },

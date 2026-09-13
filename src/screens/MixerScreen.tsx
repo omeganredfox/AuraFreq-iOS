@@ -5,6 +5,7 @@ import { AmbienceType, EntrainmentType, OscillatorWaveType } from '../audio/type
 import { AppleTheme } from '../theme/colors';
 import { AudioVisualizer } from '../components/AudioVisualizer';
 import { LissajousVisualizer } from '../components/LissajousVisualizer';
+import { StorageService } from '../store/storage';
 
 interface MixerScreenProps {
   isPlaying: boolean;
@@ -61,6 +62,31 @@ export const MixerScreen: React.FC<MixerScreenProps> = ({ isPlaying, onTogglePla
     onTogglePlay();
   };
 
+  const handleSaveFavorite = async () => {
+    try {
+      const name = `Reçete ${toneFreq}Hz + ${beatFreq}Hz`;
+      await StorageService.saveFavorite(name, {
+        mode: 'multi',
+        toneEnabled,
+        toneFrequency: toneFreq,
+        toneWave,
+        toneVolume: toneVol,
+        entrainmentEnabled,
+        entrainmentType,
+        carrierFrequency: carrierFreq,
+        beatFrequency: beatFreq,
+        entrainmentVolume: entrainmentVol,
+        ambienceType,
+        ambienceVolume: ambienceVol,
+        masterVolume: masterVol,
+      });
+      alert('Favorilere eklendi!');
+    } catch (e) {
+      console.error(e);
+      alert('Hata oluştu');
+    }
+  };
+
   const AMBIENCE_CHOICES: { id: AmbienceType; label: string; icon: string }[] = [
     { id: 'none', label: 'Kapalı', icon: '🚫' },
     { id: 'rain', label: 'Yağmur', icon: '🌧️' },
@@ -72,9 +98,14 @@ export const MixerScreen: React.FC<MixerScreenProps> = ({ isPlaying, onTogglePla
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Çoklu Katman Mikseri</Text>
-        <Text style={styles.subtitle}>Saf Ton + Beyin Dalgası + Doğa Ambiyansı</Text>
+      <View style={styles.headerRow}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Çoklu Katman Mikseri</Text>
+          <Text style={styles.subtitle}>Saf Ton + Beyin Dalgası + Doğa Ambiyansı</Text>
+        </View>
+        <TouchableOpacity style={styles.saveBtn} onPress={handleSaveFavorite}>
+          <Text style={styles.saveBtnText}>⭐ Kaydet</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Visualizer */}
@@ -311,8 +342,25 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 24,
   },
-  header: {
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 10,
+  },
+  header: {
+    flex: 1,
+  },
+  saveBtn: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  saveBtnText: {
+    color: '#FFD60A',
+    fontSize: 12,
+    fontWeight: '700',
   },
   title: {
     fontSize: 22,
