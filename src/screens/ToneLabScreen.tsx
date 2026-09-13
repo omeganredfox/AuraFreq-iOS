@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { dspEngine } from '../audio/dspEngine';
 import { OscillatorWaveType } from '../audio/types';
@@ -19,14 +19,14 @@ export const ToneLabScreen: React.FC<ToneLabScreenProps> = ({ isPlaying, onToggl
     const clamped = Math.max(20, Math.min(20000, Number(newFreq.toFixed(1))));
     setFrequency(clamped);
     if (isPlaying) {
-      dspEngine.updateParameters({ carrierFrequency: clamped, mode: 'single' });
+      dspEngine.updateParameters({ toneFrequency: clamped });
     }
   };
 
   const handleWaveChange = (newWave: OscillatorWaveType) => {
     setWaveType(newWave);
     if (isPlaying) {
-      dspEngine.updateParameters({ waveType: newWave });
+      dspEngine.updateParameters({ toneWave: newWave });
     }
   };
 
@@ -34,8 +34,12 @@ export const ToneLabScreen: React.FC<ToneLabScreenProps> = ({ isPlaying, onToggl
     if (!isPlaying) {
       dspEngine.play({
         mode: 'single',
-        carrierFrequency: frequency,
-        waveType,
+        toneEnabled: true,
+        toneFrequency: frequency,
+        toneWave: waveType,
+        toneVolume: volume,
+        entrainmentEnabled: false,
+        ambienceType: 'none',
         masterVolume: volume,
       });
     } else {
@@ -222,7 +226,7 @@ const styles = StyleSheet.create({
   },
   stepBtn: {
     flex: 1,
-    height: 44, // Gate 4: 44pt minimum
+    height: 44,
     backgroundColor: AppleTheme.colors.card,
     borderRadius: 12,
     borderWidth: 1,
@@ -279,7 +283,7 @@ const styles = StyleSheet.create({
   },
   chip: {
     minWidth: 54,
-    height: 44, // Gate 4: 44pt minimum
+    height: 44,
     backgroundColor: AppleTheme.colors.card,
     borderRadius: 12,
     borderWidth: 1,
@@ -301,7 +305,7 @@ const styles = StyleSheet.create({
     color: AppleTheme.colors.accentBlue,
   },
   masterPlayBtn: {
-    height: 54, // Gate 4: 44pt+
+    height: 54,
     backgroundColor: AppleTheme.colors.accentBlue,
     borderRadius: 16,
     alignItems: 'center',

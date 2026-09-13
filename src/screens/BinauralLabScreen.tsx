@@ -1,8 +1,9 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { dspEngine } from '../audio/dspEngine';
-import { calculateBinauralFrequencies } from '../audio/binauralMath';
+import { calculateBinauralFrequencies, calculateIsochronicPulse } from '../audio/binauralMath';
 import { BRAINWAVE_BANDS, BrainwaveBand } from '../constants/presets';
+import { EntrainmentType } from '../audio/types';
 import { AppleTheme } from '../theme/colors';
 import { AudioVisualizer } from '../components/AudioVisualizer';
 
@@ -15,17 +16,34 @@ export const BinauralLabScreen: React.FC<BinauralLabScreenProps> = ({ isPlaying,
   const [carrier, setCarrier] = useState<number>(216);
   const [selectedBand, setSelectedBand] = useState<BrainwaveBand>(BRAINWAVE_BANDS[2]); // Default Alpha (10 Hz)
   const [beatFreq, setBeatFreq] = useState<number>(10);
+  const [entrainmentType, setEntrainmentType] = useState<EntrainmentType>('binaural');
 
-  const calc = calculateBinauralFrequencies(carrier, beatFreq);
+  const binCalc = calculateBinauralFrequencies(carrier, beatFreq);
+  const isoCalc = calculateIsochronicPulse(carrier, beatFreq);
 
   const handleSelectBand = (band: BrainwaveBand) => {
     setSelectedBand(band);
     setBeatFreq(band.defaultBeat);
     if (isPlaying) {
       dspEngine.updateParameters({
-        mode: 'binaural',
         carrierFrequency: carrier,
         beatFrequency: band.defaultBeat,
+        entrainmentType,
+      });
+    }
+  };
+
+  const handleToggleEntrainmentType = (type: EntrainmentType) => {
+    setEntrainmentType(type);
+    if (isPlaying) {
+      // Re-initialize audio graph for the new mode
+      dspEngine.stop().then(() => {
+        dspEngine.play({
+          entrainmentEnabled: true,
+          entrainmentType: type,
+          carrierFrequency: carrier,
+          beatFrequency: beatFreq,
+        });
       });
     }
   };
@@ -35,9 +53,9 @@ export const BinauralLabScreen: React.FC<BinauralLabScreenProps> = ({ isPlaying,
     setBeatFreq(next);
     if (isPlaying) {
       dspEngine.updateParameters({
-        mode: 'binaural',
         carrierFrequency: carrier,
         beatFrequency: next,
+        entrainmentType,
       });
     }
   };
@@ -45,11 +63,14 @@ export const BinauralLabScreen: React.FC<BinauralLabScreenProps> = ({ isPlaying,
   const handlePlayToggle = () => {
     if (!isPlaying) {
       dspEngine.play({
-        mode: 'binaural',
+        mode: 'multi',
+        entrainmentEnabled: true,
+        entrainmentType,
         carrierFrequency: carrier,
         beatFrequency: beatFreq,
-        waveType: 'sine',
-        masterVolume: 0.7,
+        toneEnabled: false,
+        ambienceType: 'none',
+        masterVolume: 0.75,
       });
     } else {
       dspEngine.stop();
@@ -61,45 +82,98 @@ export const BinauralLabScreen: React.FC<BinauralLabScreenProps> = ({ isPlaying,
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Binaural Beyin Dalgaları</Text>
-        <Text style={styles.subtitle}>İki Kulak Arası Frekans Farkıyla Zihin Terapisi</Text>
+        <Text style={styles.title}>Beyin Dalgaları Laboratuvarı</Text>
+        <Text style={styles.subtitle}>Binaural Stereo ve İzokronik Nabız Terapisi</Text>
       </View>
 
-      {/* Headphone Advisory Notice (Apple HIG Callout) */}
-      <View style={styles.headphoneNotice}>
-        <Text style={styles.headphoneIcon}>🎧</Text>
-        <Text style={styles.headphoneText}>
-          Binaural etki için <Text style={styles.boldText}>Stereo Kulaklık</Text> şarttır. Sol ve sağ kanallar farklı frekans iletir.
-        </Text>
+      {/* Mode Selector: Binaural vs Isochronic */}
+      <View style={styles.modeToggleRow}>
+        <TouchableOpacity
+          style={[styles.modeToggleBtn, entrainmentType === 'binaural' && styles.modeToggleBtnActive]}
+          onPress={() => handleToggleEntrainmentType('binaural')}
+        >
+          <Text style={[styles.modeToggleText, entrainmentType === 'binaural' && styles.modeToggleTextActive]}>
+            🎧 BİNAURAL (STEREO)
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.modeToggleBtn, entrainmentType === 'isochronic' && styles.modeToggleBtnActive]}
+          onPress={() => handleToggleEntrainmentType('isochronic')}
+        >
+          <Text style={[styles.modeToggleText, entrainmentType === 'isochronic' && styles.modeToggleTextActive]}>
+            🔊 İZOKRONİK (KULAKLIKSIZ)
+          </Text>
+        </TouchableOpacity>
       </View>
+
+      {/* Advisory Notice */}
+      {entrainmentType === 'binaural' ? (
+        <View style={styles.headphoneNotice}>
+          <Text style={styles.headphoneIcon}>🎧</Text>
+          <Text style={styles.headphoneText}>
+            Binaural mod için <Text style={styles.boldText}>Stereo Kulaklık</Text> şarttır. Sol ve sağ kanallar farklı frekans iletir.
+          </Text>
+        </View>
+      ) : (
+        <View style={[styles.headphoneNotice, styles.isoNotice]}>
+          <Text style={styles.headphoneIcon}>🔊</Text>
+          <Text style={styles.headphoneText}>
+            İzokronik mod <Text style={styles.boldText}>Kulaklık Gerektirmez</Text>. Hoparlörden ritmik genlik vuruşları yayılır.
+          </Text>
+        </View>
+      )}
 
       {/* Visualizer */}
       <View style={styles.visualizerCard}>
         <AudioVisualizer isPlaying={isPlaying} accentColor={selectedBand.color} height={95} />
       </View>
 
-      {/* Live Stereo Split Display */}
-      <View style={styles.stereoSplitRow}>
-        <View style={styles.channelCard}>
-          <Text style={styles.channelTag}>SOL KULAK (L)</Text>
-          <Text style={styles.channelFreq}>{calc.leftFrequency}</Text>
-          <Text style={styles.channelUnit}>Hz</Text>
-        </View>
+      {/* Channel / Pulse Display */}
+      {entrainmentType === 'binaural' ? (
+        <View style={styles.stereoSplitRow}>
+          <View style={styles.channelCard}>
+            <Text style={styles.channelTag}>SOL KULAK (L)</Text>
+            <Text style={styles.channelFreq}>{binCalc.leftFrequency}</Text>
+            <Text style={styles.channelUnit}>Hz</Text>
+          </View>
 
-        <View style={styles.beatDifferenceBadge}>
-          <Text style={styles.beatDiffTitle}>BEYİN FARKI</Text>
-          <Text style={[styles.beatDiffNumber, { color: selectedBand.color }]}>
-            +{calc.frequencyDelta} Hz
-          </Text>
-          <Text style={styles.beatDiffName}>{selectedBand.name}</Text>
-        </View>
+          <View style={styles.beatDifferenceBadge}>
+            <Text style={styles.beatDiffTitle}>BEYİN FARKI</Text>
+            <Text style={[styles.beatDiffNumber, { color: selectedBand.color }]}>
+              +{binCalc.frequencyDelta} Hz
+            </Text>
+            <Text style={styles.beatDiffName}>{selectedBand.name}</Text>
+          </View>
 
-        <View style={styles.channelCard}>
-          <Text style={styles.channelTag}>SAĞ KULAK (R)</Text>
-          <Text style={styles.channelFreq}>{calc.rightFrequency}</Text>
-          <Text style={styles.channelUnit}>Hz</Text>
+          <View style={styles.channelCard}>
+            <Text style={styles.channelTag}>SAĞ KULAK (R)</Text>
+            <Text style={styles.channelFreq}>{binCalc.rightFrequency}</Text>
+            <Text style={styles.channelUnit}>Hz</Text>
+          </View>
         </View>
-      </View>
+      ) : (
+        <View style={styles.stereoSplitRow}>
+          <View style={styles.channelCard}>
+            <Text style={styles.channelTag}>TAŞIYICI TON</Text>
+            <Text style={styles.channelFreq}>{carrier}</Text>
+            <Text style={styles.channelUnit}>Hz</Text>
+          </View>
+
+          <View style={styles.beatDifferenceBadge}>
+            <Text style={styles.beatDiffTitle}>İZOKRONİK RİTİM</Text>
+            <Text style={[styles.beatDiffNumber, { color: selectedBand.color }]}>
+              {beatFreq} Hz
+            </Text>
+            <Text style={styles.beatDiffName}>Periyot: {isoCalc.periodSeconds}s</Text>
+          </View>
+
+          <View style={styles.channelCard}>
+            <Text style={styles.channelTag}>MODÜLASYON</Text>
+            <Text style={styles.channelFreq}>%50</Text>
+            <Text style={styles.channelUnit}>Pulse S-Curve</Text>
+          </View>
+        </View>
+      )}
 
       {/* Fine-Tuning Controls for Beat */}
       <View style={styles.beatTuneRow}>
@@ -158,7 +232,7 @@ export const BinauralLabScreen: React.FC<BinauralLabScreenProps> = ({ isPlaying,
         onPress={handlePlayToggle}
       >
         <Text style={styles.masterPlayBtnText}>
-          {isPlaying ? '■ BİNAURAL SEANSI DURDUR' : `▶ ${selectedBand.name.toUpperCase()} SEANSINI BAŞLAT`}
+          {isPlaying ? '■ SEANSI DURDUR' : `▶ ${entrainmentType.toUpperCase()} ${selectedBand.name.toUpperCase()} BAŞLAT`}
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -187,6 +261,34 @@ const styles = StyleSheet.create({
     color: AppleTheme.colors.textSecondary,
     marginTop: 2,
   },
+  modeToggleRow: {
+    flexDirection: 'row',
+    backgroundColor: '#16161A',
+    borderRadius: 12,
+    padding: 3,
+    marginBottom: 10,
+    gap: 4,
+  },
+  modeToggleBtn: {
+    flex: 1,
+    height: 38,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modeToggleBtnActive: {
+    backgroundColor: AppleTheme.colors.cardHover,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  modeToggleText: {
+    color: AppleTheme.colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  modeToggleTextActive: {
+    color: AppleTheme.colors.textPrimary,
+  },
   headphoneNotice: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -198,8 +300,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     gap: 8,
   },
+  isoNotice: {
+    backgroundColor: 'rgba(48, 209, 88, 0.1)',
+    borderColor: 'rgba(48, 209, 88, 0.25)',
+  },
   headphoneIcon: {
-    fontSize: 20,
+    fontSize: 18,
   },
   headphoneText: {
     flex: 1,
@@ -231,7 +337,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   channelTag: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '700',
     color: AppleTheme.colors.textSecondary,
     letterSpacing: 0.5,
@@ -243,7 +349,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   channelUnit: {
-    fontSize: 11,
+    fontSize: 10,
     color: AppleTheme.colors.textSecondary,
   },
   beatDifferenceBadge: {
@@ -294,14 +400,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   currentBeatBox: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
   },
   currentBeatText: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
   },
   sectionHeader: {
@@ -368,7 +474,7 @@ const styles = StyleSheet.create({
   },
   masterPlayBtnText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     letterSpacing: 0.5,
   },

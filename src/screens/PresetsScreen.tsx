@@ -1,8 +1,8 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { dspEngine } from '../audio/dspEngine';
 import { SOLFEGGIO_PRESETS, NATURAL_PRESETS, FrequencyPreset } from '../constants/presets';
-import { NoiseType } from '../audio/types';
+import { AmbienceType } from '../audio/types';
 import { AppleTheme } from '../theme/colors';
 
 interface PresetsScreenProps {
@@ -12,7 +12,7 @@ interface PresetsScreenProps {
 
 export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onTogglePlay }) => {
   const [activePresetId, setActivePresetId] = useState<string>('solf-528');
-  const [noiseType, setNoiseType] = useState<NoiseType>('none');
+  const [ambienceType, setAmbienceType] = useState<AmbienceType>('none');
   const [sleepTimerMinutes, setSleepTimerMinutes] = useState<number | null>(null);
 
   const allPresets: FrequencyPreset[] = [...NATURAL_PRESETS, ...SOLFEGGIO_PRESETS];
@@ -21,29 +21,30 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
     setActivePresetId(preset.id);
     dspEngine.play({
       mode: 'single',
-      carrierFrequency: preset.frequency,
-      waveType: preset.waveType,
-      noiseType,
-      noiseVolume: 0.25,
-      masterVolume: 0.7,
+      toneEnabled: true,
+      toneFrequency: preset.frequency,
+      toneWave: preset.waveType,
+      toneVolume: 0.7,
+      ambienceType,
+      ambienceVolume: 0.3,
+      masterVolume: 0.75,
     });
     if (!isPlaying) {
       onTogglePlay();
     }
   };
 
-  const handleToggleNoise = (type: NoiseType) => {
-    const nextType = noiseType === type ? 'none' : type;
-    setNoiseType(nextType);
+  const handleToggleAmbience = (type: AmbienceType) => {
+    const nextType = ambienceType === type ? 'none' : type;
+    setAmbienceType(nextType);
     if (isPlaying) {
-      dspEngine.updateParameters({ noiseType: nextType, noiseVolume: 0.25 });
+      dspEngine.updateParameters({ ambienceType: nextType, ambienceVolume: 0.3 });
     }
   };
 
   const handleSetTimer = (minutes: number | null) => {
     setSleepTimerMinutes(minutes);
     if (minutes !== null) {
-      // In a production build this triggers background fade-out
       setTimeout(() => {
         dspEngine.stop();
         if (isPlaying) onTogglePlay();
@@ -52,10 +53,11 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
     }
   };
 
-  const NOISE_OPTIONS: { id: NoiseType; label: string; desc: string }[] = [
-    { id: 'pink', label: 'Pembe (Pink)', desc: 'Dinlendirici yağmur/şelale' },
-    { id: 'brown', label: 'Kahverengi (Brown)', desc: 'Derin uğultu, ADHD odak' },
-    { id: 'white', label: 'Beyaz (White)', desc: 'Tüm frekanslar, ses maskeleme' },
+  const AMBIENCE_OPTIONS: { id: AmbienceType; label: string; desc: string }[] = [
+    { id: 'rain', label: '🌧️ Yağmur', desc: 'Sakinleştirici doğal yağmur sesi' },
+    { id: 'ocean', label: '🌊 Okyanus', desc: '12 sn ritmik okyanus dalgaları' },
+    { id: 'pink', label: '🌸 Pembe', desc: '1/f dinlendirici gürültü' },
+    { id: 'brown', label: '🍂 Kahverengi', desc: 'Derin uğultu, odaklanma' },
   ];
 
   return (
@@ -63,21 +65,21 @@ export const PresetsScreen: React.FC<PresetsScreenProps> = ({ isPlaying, onToggl
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Rezonans & Şifa Presetleri</Text>
-        <Text style={styles.subtitle}>Kadim Solfeggio Frekansları & Ambiyans Mikseri</Text>
+        <Text style={styles.subtitle}>Kadim Solfeggio Frekansları & Doğa Mikseri</Text>
       </View>
 
       {/* Background Ambience / Noise Layer */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionLabel}>ARKAPLAN RENKLİ GÜRÜLTÜ MİKSERİ</Text>
+        <Text style={styles.sectionLabel}>ARKAPLAN DOĞA & RENKLİ GÜRÜLTÜ</Text>
       </View>
       <View style={styles.noiseRow}>
-        {NOISE_OPTIONS.map((opt) => (
+        {AMBIENCE_OPTIONS.map((opt) => (
           <TouchableOpacity
             key={opt.id}
-            style={[styles.noiseCard, noiseType === opt.id && styles.noiseCardActive]}
-            onPress={() => handleToggleNoise(opt.id)}
+            style={[styles.noiseCard, ambienceType === opt.id && styles.noiseCardActive]}
+            onPress={() => handleToggleAmbience(opt.id)}
           >
-            <Text style={[styles.noiseLabel, noiseType === opt.id && styles.noiseLabelActive]}>
+            <Text style={[styles.noiseLabel, ambienceType === opt.id && styles.noiseLabelActive]}>
               {opt.label}
             </Text>
             <Text style={styles.noiseDesc}>{opt.desc}</Text>
@@ -182,17 +184,18 @@ const styles = StyleSheet.create({
   },
   noiseRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
     marginBottom: 16,
   },
   noiseCard: {
-    flex: 1,
+    width: '48%',
     backgroundColor: AppleTheme.colors.card,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: AppleTheme.colors.cardBorder,
     padding: 10,
-    minHeight: 56, // Gate 4: >=44pt
+    minHeight: 56,
     justifyContent: 'center',
   },
   noiseCardActive: {
@@ -219,7 +222,7 @@ const styles = StyleSheet.create({
   },
   timerBtn: {
     flex: 1,
-    height: 44, // Gate 4: 44pt minimum
+    height: 44,
     backgroundColor: AppleTheme.colors.card,
     borderRadius: 12,
     borderWidth: 1,

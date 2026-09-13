@@ -1,24 +1,31 @@
-﻿export type OscillatorWaveType = 'sine' | 'triangle' | 'sawtooth' | 'square';
-export type AudioPlayMode = 'single' | 'binaural' | 'preset';
-export type NoiseType = 'none' | 'pink' | 'brown' | 'white';
+export type OscillatorWaveType = 'sine' | 'triangle' | 'sawtooth' | 'square';
+export type AudioPlayMode = 'single' | 'binaural' | 'isochronic' | 'multi';
+export type AmbienceType = 'none' | 'pink' | 'brown' | 'white' | 'rain' | 'ocean';
+export type NoiseType = AmbienceType; // Backwards compatible alias
+export type EntrainmentType = 'binaural' | 'isochronic';
 
-export interface AudioEngineConfig {
+export interface MultiLayerMixerConfig {
   mode: AudioPlayMode;
-  carrierFrequency: number;
-  beatFrequency: number; // for binaural
-  leftFrequency: number;
-  rightFrequency: number;
-  waveType: OscillatorWaveType;
-  masterVolume: number; // 0.0 to 1.0
-  noiseType: NoiseType;
-  noiseVolume: number; // 0.0 to 1.0
-}
+  
+  // Layer 1: Solfeggio / Saf Ton Katmanı
+  toneEnabled: boolean;
+  toneFrequency: number;
+  toneWave: OscillatorWaveType;
+  toneVolume: number; // 0.0 - 1.0
 
-export interface AudioEngineStatus {
-  isPlaying: boolean;
-  config: AudioEngineConfig;
-  activePresetId?: string;
-  sleepTimerRemainingSeconds: number | null;
+  // Layer 2: Beyin Dalgası Uyarımı (Binaural veya İzokronik)
+  entrainmentEnabled: boolean;
+  entrainmentType: EntrainmentType;
+  carrierFrequency: number;
+  beatFrequency: number;
+  entrainmentVolume: number; // 0.0 - 1.0
+
+  // Layer 3: Doğal Ambiyans & Renkli Gürültü
+  ambienceType: AmbienceType;
+  ambienceVolume: number; // 0.0 - 1.0
+
+  // Ana Çıkış
+  masterVolume: number; // 0.0 - 1.0
 }
 
 export interface AudioQualityGateMetrics {

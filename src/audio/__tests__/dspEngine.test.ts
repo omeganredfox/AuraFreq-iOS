@@ -1,8 +1,10 @@
-﻿import {
+import {
   calculateBinauralFrequencies,
+  calculateIsochronicPulse,
   validateFrequencyGate1,
   validateStereoIsolationGate2,
   calculateEnvelopeRamp,
+  validateMultiLayerSafety,
 } from '../binauralMath';
 import { SOLFEGGIO_PRESETS, BRAINWAVE_BANDS, NATURAL_PRESETS } from '../../constants/presets';
 
@@ -24,7 +26,7 @@ describe('🧪 AURAFREQ QUALITY GATES VERIFICATION SUITE', () => {
       expect(result.rightFrequency).toBe(435.92);
       expect(result.frequencyDelta).toBeCloseTo(7.84, 1);
       expect(result.frequencyAccuracyPercent).toBeLessThan(0.2);
-      expect(result.detectedBand?.id).toBe('theta'); // 7.83 Hz is in theta/border
+      expect(result.detectedBand?.id).toBe('theta');
     });
 
     test('Delta deep sleep band (2.5 Hz) accuracy', () => {
@@ -67,13 +69,37 @@ describe('🧪 AURAFREQ QUALITY GATES VERIFICATION SUITE', () => {
   });
 
   describe('Gate 4: Apple Human Interface Guidelines Standards', () => {
-    const MIN_APPLE_TOUCH_SIZE = 44; // 44x44 pt
+    const MIN_APPLE_TOUCH_SIZE = 44;
 
     test('Apple Touch Target must be at least 44pt', () => {
-      const standardButtonSize = 56; // Our primary dial and play button size
-      const tabTargetSize = 48; // Our bottom tab target size
+      const standardButtonSize = 54;
+      const tabTargetSize = 48;
       expect(standardButtonSize).toBeGreaterThanOrEqual(MIN_APPLE_TOUCH_SIZE);
       expect(tabTargetSize).toBeGreaterThanOrEqual(MIN_APPLE_TOUCH_SIZE);
+    });
+  });
+
+  describe('Faz 2 DSP: Isochronic Tones & Multi-Layer Mixer', () => {
+    test('Calculates Isochronic pulse period and allows mono speaker listening', () => {
+      const isoResult = calculateIsochronicPulse(432, 10);
+      expect(isoResult.pulseFrequency).toBe(10);
+      expect(isoResult.carrierFrequency).toBe(432);
+      expect(isoResult.periodSeconds).toBe(0.1); // 1 / 10 = 0.1s
+      expect(isoResult.isHeadphoneRequired).toBe(false);
+      expect(isoResult.detectedBand?.id).toBe('alpha');
+    });
+
+    test('Isochronic Theta meditation pulse (6 Hz)', () => {
+      const isoResult = calculateIsochronicPulse(528, 6);
+      expect(isoResult.pulseFrequency).toBe(6);
+      expect(isoResult.periodSeconds).toBeCloseTo(0.1667, 3);
+      expect(isoResult.detectedBand?.id).toBe('theta');
+    });
+
+    test('Validates multi-layer volume boundaries to prevent hard digital clipping', () => {
+      expect(validateMultiLayerSafety(0.5, 0.5, 0.5, 0.8)).toBe(true);
+      expect(validateMultiLayerSafety(1.5, 0.5, 0.5, 0.8)).toBe(false); // Tone volume overflow
+      expect(validateMultiLayerSafety(0.5, 0.5, 0.5, 1.2)).toBe(false); // Master volume overflow
     });
   });
 

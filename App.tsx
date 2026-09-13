@@ -1,15 +1,16 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import { IPhoneSimulator } from './src/components/iPhoneSimulator';
 import { ToneLabScreen } from './src/screens/ToneLabScreen';
 import { BinauralLabScreen } from './src/screens/BinauralLabScreen';
+import { MixerScreen } from './src/screens/MixerScreen';
 import { PresetsScreen } from './src/screens/PresetsScreen';
 import { AppleTheme } from './src/theme/colors';
 
-type TabKey = 'tone' | 'binaural' | 'presets';
+type TabKey = 'tone' | 'binaural' | 'mixer' | 'presets';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabKey>('binaural');
+  const [activeTab, setActiveTab] = useState<TabKey>('mixer');
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   const handleTogglePlay = () => {
@@ -48,6 +49,9 @@ export default function App() {
           {activeTab === 'binaural' && (
             <BinauralLabScreen isPlaying={isPlaying} onTogglePlay={handleTogglePlay} />
           )}
+          {activeTab === 'mixer' && (
+            <MixerScreen isPlaying={isPlaying} onTogglePlay={handleTogglePlay} />
+          )}
           {activeTab === 'presets' && (
             <PresetsScreen isPlaying={isPlaying} onTogglePlay={handleTogglePlay} />
           )}
@@ -75,7 +79,19 @@ export default function App() {
               🧠
             </Text>
             <Text style={[styles.tabLabel, activeTab === 'binaural' && styles.tabLabelActive]}>
-              Binaural
+              Beyin
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => setActiveTab('mixer')}
+          >
+            <Text style={[styles.tabIcon, activeTab === 'mixer' && styles.tabIconActive]}>
+              🎛️
+            </Text>
+            <Text style={[styles.tabLabel, activeTab === 'mixer' && styles.tabLabelActive]}>
+              Mikser
             </Text>
           </TouchableOpacity>
 
@@ -87,7 +103,7 @@ export default function App() {
               ✨
             </Text>
             <Text style={[styles.tabLabel, activeTab === 'presets' && styles.tabLabelActive]}>
-              Şifa & Preset
+              Şifa
             </Text>
           </TouchableOpacity>
         </View>
@@ -176,7 +192,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0D0D10',
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingBottom: 4,
   },
   tabItem: {

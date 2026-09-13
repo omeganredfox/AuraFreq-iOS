@@ -1,4 +1,4 @@
-﻿import { BRAINWAVE_BANDS, BrainwaveBand } from '../constants/presets';
+import { BRAINWAVE_BANDS, BrainwaveBand } from '../constants/presets';
 
 export interface BinauralCalculationResult {
   carrierFrequency: number;
@@ -8,6 +8,15 @@ export interface BinauralCalculationResult {
   detectedBand: BrainwaveBand | null;
   frequencyDelta: number;
   frequencyAccuracyPercent: number;
+}
+
+export interface IsochronicCalculationResult {
+  carrierFrequency: number;
+  pulseFrequency: number;
+  detectedBand: BrainwaveBand | null;
+  periodSeconds: number;
+  pulseAccuracyPercent: number;
+  isHeadphoneRequired: boolean;
 }
 
 /**
@@ -45,6 +54,33 @@ export function calculateBinauralFrequencies(
 }
 
 /**
+ * Calculates isochronic pulse parameters (operates without headphones)
+ */
+export function calculateIsochronicPulse(
+  carrierFrequency: number,
+  pulseFrequency: number
+): IsochronicCalculationResult {
+  const safeCarrier = Math.max(20, Math.min(1500, carrierFrequency));
+  const safePulse = Math.max(0.1, Math.min(100, pulseFrequency));
+
+  const detectedBand = BRAINWAVE_BANDS.find(
+    (band) => safePulse >= band.minBeat && safePulse < band.maxBeat
+  ) || null;
+
+  const periodSeconds = Number((1 / safePulse).toFixed(4));
+  const pulseAccuracyPercent = 0.0; // Math-exact LFO frequency
+
+  return {
+    carrierFrequency: safeCarrier,
+    pulseFrequency: safePulse,
+    detectedBand,
+    periodSeconds,
+    pulseAccuracyPercent,
+    isHeadphoneRequired: false,
+  };
+}
+
+/**
  * Validates whether the frequency difference meets Quality Gate 1 (< 0.1% deviation)
  */
 export function validateFrequencyGate1(carrier: number, beat: number): boolean {
@@ -65,7 +101,7 @@ export function validateStereoIsolationGate2(leftFreq: number, rightFreq: number
 export function calculateEnvelopeRamp(
   startGain: number,
   targetGain: number,
-  durationMs: number = 25
+  durationMs: number = 30
 ): { isSafe: boolean; durationMs: number; steps: number[] } {
   const isSafe = durationMs >= 15; // Gate 3 requires at least 15ms ramp to prevent pop
   const stepsCount = 10;
@@ -79,4 +115,22 @@ export function calculateEnvelopeRamp(
   }
 
   return { isSafe, durationMs, steps };
+}
+
+/**
+ * Multi-layer gain safety validator to prevent digital clipping before compressor
+ */
+export function validateMultiLayerSafety(
+  toneVol: number,
+  entrainmentVol: number,
+  ambienceVol: number,
+  masterVol: number
+): boolean {
+  // Master volume must not exceed 1.0
+  if (masterVol > 1.0 || masterVol < 0) return false;
+  // Individual layers must be normalized between 0 and 1
+  if (toneVol < 0 || toneVol > 1) return false;
+  if (entrainmentVol < 0 || entrainmentVol > 1) return false;
+  if (ambienceVol < 0 || ambienceVol > 1) return false;
+  return true;
 }
